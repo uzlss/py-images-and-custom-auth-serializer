@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
-from rest_framework.authtoken.serializers import AuthTokenSerializer as DjangoAuthTokenSerializer
+from rest_framework.authtoken.serializers import (
+    AuthTokenSerializer as DjangoAuthTokenSerializer,
+)
 from django.utils.translation import gettext as _
 
 
@@ -33,23 +35,24 @@ class AuthTokenSerializer(DjangoAuthTokenSerializer):
     )
 
     def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
+        email = attrs.get("email")
+        password = attrs.get("password")
 
         if email and password:
-            user = authenticate(request=self.context.get('request'),
-                                email=email, password=password)
+            user = authenticate(
+                request=self.context.get("request"),
+                email=email, password=password
+            )
 
             # The authenticate call simply returns None for is_active=False
             # users. (Assuming the default ModelBackend authentication
             # backend.)
             if not user:
-                msg = _('Unable to log in with provided credentials.')
-                raise serializers.ValidationError(msg, code='authorization')
+                msg = _("Unable to log in with provided credentials.")
+                raise serializers.ValidationError(msg, code="authorization")
         else:
             msg = _('Must include "username" and "password".')
-            raise serializers.ValidationError(msg, code='authorization')
+            raise serializers.ValidationError(msg, code="authorization")
 
-        attrs['user'] = user
+        attrs["user"] = user
         return attrs
-
